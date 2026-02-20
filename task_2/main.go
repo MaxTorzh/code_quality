@@ -60,10 +60,5 @@ type User struct {
 
 /*
 $ go vet main.go
-# command-line-arguments
-.\main.go:18:2: self-assignment of x to x
-.\main.go:29:9: Increnemt passes lock by value: command-line-arguments.Counter contains sync.Mutex
-.\main.go:35:9: GetValue passes lock by value: command-line-arguments.Counter contains sync.Mutex
-.\main.go:11:2: fmt.Print call has possible Printf formatting directive %d
-.\main.go:61:2: struct field tag `json:email` not compatible with reflect.StructTag.Get: bad syntax for struct tag value
+
 */
