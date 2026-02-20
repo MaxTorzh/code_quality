@@ -1,38 +1,35 @@
 package task_2
 
-import(
+import (
 	"fmt"
 	"sync"
 )
-// Неправильный форматтер в Printf
+
 func printExample() {
 	name := "Max"
 	age := 35
-	fmt.Print("Name: %d, Age: %s", name, age) // %d для string, %s для int
+	fmt.Printf("Name: %s, Age: %d", name, age) // Изменил на корректные
 }
 
-// Бессмысленное присваивание
 func uselessAssignment() {
 	x := 5
-	y := 10
-	x = x // Бессмысленное присваивание самому себе
+	y := 1
 	z := x + y
-	_ = z // Blank identifier
+	_ = z
 }
 
-// Копирование мьютекса по значению
 type Counter struct {
-	mu sync.Mutex
+	mu    sync.Mutex
 	value int
 }
 
-func (c Counter) Increnemt() { // Передача по значению копирует мьютекс
+func (c *Counter) Increnemt() { // Добавил указатель
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	c.value++
 }
 
-func (c Counter) GetValue() int {
+func (c *Counter) GetValue() int {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	return c.value
@@ -43,8 +40,9 @@ func rangeProblem() {
 	values := []int{1, 2, 3, 4, 5}
 
 	for _, v := range values {
+		val := v
 		funcs = append(funcs, func() {
-			fmt.Printf("%d", v) // Все функции печатают последнее значение
+			fmt.Printf("%d", val) // Создал копию переменной v
 		})
 	}
 
@@ -54,10 +52,18 @@ func rangeProblem() {
 	fmt.Println()
 }
 
-// Некорректный тег структуры
 type User struct {
-	Name string `json:"name"`
-	Age int `json:"age"`
-	Email string `json:email`
+	Name  string `json:"name"`
+	Age   int    `json:"age"`
+	Email string `json:"email"`
 }
 
+/*
+$ go vet main.go
+# command-line-arguments
+.\main.go:18:2: self-assignment of x to x
+.\main.go:29:9: Increnemt passes lock by value: command-line-arguments.Counter contains sync.Mutex
+.\main.go:35:9: GetValue passes lock by value: command-line-arguments.Counter contains sync.Mutex
+.\main.go:11:2: fmt.Print call has possible Printf formatting directive %d
+.\main.go:61:2: struct field tag `json:email` not compatible with reflect.StructTag.Get: bad syntax for struct tag value
+*/
