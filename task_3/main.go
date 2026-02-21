@@ -3,52 +3,62 @@ package main
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
-	"time"
+	"os"
 )
 
-// Необработанная ошибка
-func readFileUnsafe() {
-	data, _ := ioutil.ReadFile("config.txt")
+// Ошибка обработана
+func readFileSafe() {
+	data, err := os.ReadFile("config.txt")
+	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			fmt.Println("Config file not found, using defaults")
+			return
+		}
+		fmt.Printf("Error reading file: %v\n", err)
+		return
+	}
 	fmt.Println(string(data))
 }
 
-// Магическое число
+// Константа вместо магического числа
+const discountRate = 0.15
+
 func calculateDiscount(price float64) float64 {
-	return price * 0.15
+	return price * discountRate
 }
 
-//Неиспользуемый параметр (unparam)
-func processUser(name string, age int, unused string) string {
+// Убрал неиспользуемый параметр
+func processUser(name string, age int) string {
 	return fmt.Sprintf("User: %s, Age: %d", name, age)
 }
 
-//Избыточная сложность цикла
-func complexFunction(items []int) int {
+// Упростил сложность
+func simplifiedFunction(items []int) int {
 	result := 0
-	for i := 0; i < len(items); i++ {
-		if items[i] > 0 {
-			if items[i]%2 == 0 {
-				if items[i] > 100 {
-					result += items[i] * 2
-				} else if items[i] > 50 {
-					result += items[i]
-				} else {
-					result += items[i] / 2
-				}
+	for _, item := range items {
+		if item <= 0 {
+			continue
+		}
+		
+		switch {
+		case item > 100 && item%2 == 0:
+			result += item * 2
+		case item > 50:
+			result += item
+		case item > 75 && item%2 != 0:
+			result += item * 3
+		default:
+			if item%2 == 0 {
+				result += item / 2
 			} else {
-				if items[i] > 75 {
-					result += items[i] * 3
-				} else {
-					result += items[i]
-				}
+				result += item
 			}
 		}
 	}
 	return result
 }
 
-//Сравнение с ошибкой напрямую
+// Использую errors.Is
 var ErrNotFound = errors.New("not found")
 
 func findItem(id int) error {
@@ -60,36 +70,42 @@ func findItem(id int) error {
 
 func processItem(id int) {
 	err := findItem(id)
-	if err == ErrNotFound { // Сравнение с конкретным значением ошибки
+	if errors.Is(err, ErrNotFound) {
 		fmt.Println("Item not found")
+	} else if err != nil {
+		fmt.Printf("Unexpected error: %v\n", err)
 	}
 }
 
-// Небезопасный вызов Sleep в цикле
-func badLoop() {
+// Удалил неиспользуемую глобальную переменную
+
+// Убрал Sleep из цикла или добавим контекст
+func betterLoop() {
 	for i := 0; i < 10; i++ {
 		fmt.Printf("Iteration %d\n", i)
-		time.Sleep(1 * time.Second) // Небезопасно в проде
 	}
 }
 
-const longString = "Это очень длинная строка, которая превышает стандартный лимит в 120 символов и должна быть обнаружена линтером lll, который проверяет длину строк в коде"
+// Разбил длинную строку
+const longString = "Это очень длинная строка, которая превышает стандартный лимит " +
+	"в 120 символов. Мы разбили её на несколько частей, чтобы " +
+	"удовлетворить требованиям линтера lll."
 
 func main() {
-	readFileUnsafe()
+	readFileSafe()
 	
 	discount := calculateDiscount(100.0)
 	fmt.Printf("Discount: %.2f\n", discount)
 	
-	processUser("Alice", 30, "unused")
+	processUser("Alice", 30)
 	
 	items := []int{10, 25, 60, 120, 30}
-	result := complexFunction(items)
-	fmt.Printf("Complex result: %d\n", result)
+	result := simplifiedFunction(items)
+	fmt.Printf("Simplified result: %d\n", result)
 	
 	processItem(-1)
 	
-	badLoop()
+	betterLoop()
 	
 	fmt.Println(longString)
 }
