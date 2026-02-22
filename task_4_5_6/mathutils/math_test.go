@@ -130,13 +130,19 @@ func TestAverage(t *testing.T) {
 
 func BenchmarkFibonacci(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		Fibonacci(20)
+		_, err := Fibonacci(20)
+		if err != nil {
+			b.Fatalf("Fibonacci failed: %v", err)
+		}
 	}
 }
 
 func BenchmarkFibonacciRecursive(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		FibonacciRecursive(20)
+		_, err := FibonacciRecursive(20)
+		if err != nil {
+			b.Fatalf("FibonacciRecursive failed: %v", err)
+		}
 	}
 }
 
@@ -168,6 +174,9 @@ func BenchmarkAverage(b *testing.B) {
 	b.ResetTimer()
 	
 	for i := 0; i < b.N; i++ {
-		Average(data)
+		_, err := Average(data)
+		if err != nil {
+			b.Fatalf("Average failed: %v", err)
+		}
 	}
 }
