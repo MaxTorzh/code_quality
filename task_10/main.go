@@ -23,6 +23,3 @@ func divide(a, b int) (int, error) {
 	}
 	return a / b, nil
 }
-
-// TODO: add more functions - сработает предупреждение без issue
-// TODO-123: implement multiplication - ок, есть issue
